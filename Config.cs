@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Terraria.ModLoader.Config;
 
-namespace ZephsImprovedTooltips
+namespace ZephsImprovedTooltipsport
 {
 
 // Labels and tooltips live in Localization/en-US_Mods.ZephsImprovedTooltips.hjson

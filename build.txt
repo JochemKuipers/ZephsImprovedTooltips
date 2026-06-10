@@ -1,5 +1,5 @@
 author = YoinkBoi
 version = 0.18
-displayName = Zeph's Improved Tooltips
+displayName = Zeph's Improved Tooltips - 1.4.5 port
 homepage = https://github.com/JochemKuipers/ZephsImprovedTooltips
 side = Client

@@ -5,7 +5,7 @@
 
 	<!-- General -->
 	<PropertyGroup>
-		<AssemblyName>ZephsImprovedTooltips</AssemblyName>
+		<AssemblyName>ZephsImprovedTooltipsport</AssemblyName>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 

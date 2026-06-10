@@ -1,6 +1,6 @@
 using Terraria.ModLoader;
 
-namespace ZephsImprovedTooltips
+namespace ZephsImprovedTooltipsport
 {
-    internal class ZephsImprovedTooltips : Mod;
+    internal class ZephsImprovedTooltipsport : Mod;
 }

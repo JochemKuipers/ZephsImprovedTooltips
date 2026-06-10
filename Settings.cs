@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
-namespace ZephsImprovedTooltips
+namespace ZephsImprovedTooltipsport
 {
 
 public class Settings

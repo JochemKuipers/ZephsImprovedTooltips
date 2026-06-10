@@ -5,7 +5,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace ZephsImprovedTooltips
+namespace ZephsImprovedTooltipsport
 {
 
 //Tracks the real damage dealt per weapon while the local player uses it.

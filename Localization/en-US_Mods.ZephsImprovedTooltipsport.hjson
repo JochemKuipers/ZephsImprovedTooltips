@@ -51,6 +51,11 @@ Configs: {
 			Label: Mod Name Colour
 			Tooltip: ""
 		}
+
+		configSettings: {
+			Label: config Settings
+			Tooltip: ""
+		}
 	}
 
 	ReforgeVisibility: {
@@ -82,6 +87,80 @@ Configs: {
 
 		AlwaysShow: {
 			Label: Always Show
+			Tooltip: ""
+		}
+	}
+
+	Settings: {
+		Tooltip: ""
+
+		reforgeVisiblity: {
+			Label: reforge Visiblity
+			Tooltip: ""
+		}
+
+		sellVisibility: {
+			Label: sell Visibility
+			Tooltip: ""
+		}
+
+		copperColour: {
+			Label: copper Colour
+			Tooltip: ""
+		}
+
+		silverColour: {
+			Label: silver Colour
+			Tooltip: ""
+		}
+
+		goldColour: {
+			Label: gold Colour
+			Tooltip: ""
+		}
+
+		platColour: {
+			Label: plat Colour
+			Tooltip: ""
+		}
+
+		reforgeColour: {
+			Label: reforge Colour
+			Tooltip: ""
+		}
+
+		highlightColour: {
+			Label: highlight Colour
+			Tooltip: ""
+		}
+
+		modColour: {
+			Label: mod Colour
+			Tooltip: ""
+		}
+
+		useHighlightColour: {
+			Label: use Highlight Colour
+			Tooltip: ""
+		}
+
+		showModName: {
+			Label: show Mod Name
+			Tooltip: ""
+		}
+
+		showAmmunition: {
+			Label: show Ammunition
+			Tooltip: ""
+		}
+
+		showMeasuredDps: {
+			Label: show Measured Dps
+			Tooltip: ""
+		}
+
+		enabled: {
+			Label: enabled
 			Tooltip: ""
 		}
 	}
