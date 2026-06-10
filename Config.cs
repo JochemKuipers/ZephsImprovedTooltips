@@ -53,6 +53,12 @@ public class TooltipConfig : ModConfig
         set => _configSettings.showAmmunition = value;
     }
 
+    [DefaultValue(true)]
+    public bool ShowMeasuredDps {
+        get => _configSettings.showMeasuredDps;
+        set => _configSettings.showMeasuredDps = value;
+    }
+
     [DefaultValue(typeof(Color), "80, 140, 80, 255")]
     public Color ReforgeColour {
         get => _configSettings.reforgeColour;

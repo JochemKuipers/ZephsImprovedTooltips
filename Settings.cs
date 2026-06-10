@@ -35,6 +35,7 @@ public class Settings
         public bool useHighlightColour = true;
         public bool showModName = true;
         public bool showAmmunition = true;
+    public bool showMeasuredDps = true;
         public bool enabled = true;
 
     }

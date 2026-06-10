@@ -32,6 +32,11 @@ Configs: {
 			Tooltip: ""
 		}
 
+		ShowMeasuredDps: {
+			Label: Show Measured DPS
+			Tooltip: Shows the real damage per second a weapon dealt while you used it, including secondary effects
+		}
+
 		ReforgeColour: {
 			Label: Reforge Colour
 			Tooltip: ""

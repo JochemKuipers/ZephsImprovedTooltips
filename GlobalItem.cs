@@ -116,6 +116,13 @@ namespace ZephsImprovedTooltips
             return $"{colour.R:x2}{colour.G:x2}{colour.B:x2}";
         }
 
+        //direct melee hits don't go through a projectile, record them here
+        public override void OnHitNPC(Item item, Player player, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (player.whoAmI == Main.myPlayer)
+                DpsTracker.RecordDamage(item.type, damageDone);
+        }
+
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if (!Settings.enabled)
@@ -235,7 +242,7 @@ namespace ZephsImprovedTooltips
                     var spaceIndex = line.Text.IndexOf(' ');
                     if (spaceIndex >= 0)
                     {
-                        line.Text = startColour + line.Text.Substring(0, spaceIndex) + endColour + line.Text.Substring(spaceIndex, line.Text.Length - spaceIndex);
+                        line.Text = string.Concat(startColour, line.Text.AsSpan(0, spaceIndex), endColour, line.Text.AsSpan(spaceIndex, line.Text.Length - spaceIndex));
                     }
                 }
 
@@ -282,6 +289,17 @@ namespace ZephsImprovedTooltips
                         }
                         tooltips.Insert(i + 1, dpsLine);
                         i++;
+
+                        //the theoretical number can't account for secondary effects (split projectiles,
+                        //explosions, multi-hits), so also show the real DPS measured while using the weapon
+                        if (Settings.showMeasuredDps && DpsTracker.TryGetMeasuredDps(item.type, out var measuredDps))
+                        {
+                            var measuredLine = new TooltipLine(Mod, "MeasuredDPS",
+                                startColour + measuredDps + endColour + " measured damage per second");
+                            tooltips.Insert(i + 1, measuredLine);
+                            i++;
+                        }
+
                         break;
                     }
                     case "Knockback" when line.Text.Length >= 10:
