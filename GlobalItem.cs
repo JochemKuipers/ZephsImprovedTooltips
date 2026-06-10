@@ -7,13 +7,9 @@ using Terraria.ModLoader;
 
 namespace ZephsImprovedTooltips
 {
-	public class ZephsImprovedTooltipsGlobalItem : GlobalItem
-	{
-        static public Settings settings = new Settings();
-
-		public ZephsImprovedTooltipsGlobalItem()
-		{
-		}
+    public class ZephsImprovedTooltipsGlobalItem : GlobalItem
+    {
+        public static Settings settings = new();
 
         public void splitValue(int totalCopper, out int plat, out int gold, out int silver, out int copper)
         {
@@ -56,33 +52,30 @@ namespace ZephsImprovedTooltips
 
         public void reforgePriceTooltip(Item item, TooltipLine line)
         {
-            bool enabled = true;
-            if (settings.reforgeVisiblity == Settings.ReforgeVisibility.NeverShow
-                || (settings.reforgeVisiblity == Settings.ReforgeVisibility.ShowIfTinkererExists && !NPC.savedGoblin))
-                enabled = false;
-                
-            int totalValue = (int)(item.GetStoreValue() / 3.0f);
+            var enabled = !(settings.reforgeVisiblity == Settings.ReforgeVisibility.NeverShow
+                            || (settings.reforgeVisiblity == Settings.ReforgeVisibility.ShowIfTinkererExists && !NPC.savedGoblin));
+
+            var totalValue = (int)(item.GetStoreValue() / 3.0f);
 
             if (!enabled || item.maxStack > 1 || item.vanity || totalValue == 0
                 || (!item.accessory && item.defense > 0))
             {
-                line.text = "";
+                line.Text = "";
                 return;
             }
 
-            line.text = "Reforge price: ";
-            line.overrideColor = settings.reforgeColour;
+            line.Text = "Reforge price: ";
+            line.OverrideColor = settings.reforgeColour;
 
-            int plat, gold, silver, copper;
-            splitValue(totalValue, out plat, out gold, out silver, out copper);
-            line.text += valueAsString(plat, gold, silver, copper);
+            splitValue(totalValue, out var plat, out var gold, out var silver, out var copper);
+            line.Text += valueAsString(plat, gold, silver, copper);
         }
 
         public void sellPriceTooltip(Item item, TooltipLine line)
         {
             bool enabled = settings.sellVisibility == Settings.SellVisibility.AlwaysShow;
 
-            int totalValue = (int)((item.GetStoreValue() * item.stack) / 5.0f);
+            int totalValue = (int)((item.GetStoreValue() * (long)item.stack) / 5.0f);
 
             if (!enabled ||
                 item.type == ItemID.CopperCoin ||
@@ -91,44 +84,43 @@ namespace ZephsImprovedTooltips
                 item.type == ItemID.PlatinumCoin ||
                 totalValue == 0)
             {
-                line.text = "";
+                line.Text = "";
                 return;
             }
 
-            line.text = "Sell price: ";
+            line.Text = "Sell price: ";
 
-            int plat, gold, silver, copper;
-            splitValue(totalValue, out plat, out gold, out silver, out copper);
-            line.text += valueAsString(plat, gold, silver, copper);
+            splitValue(totalValue, out var plat, out var gold, out var silver, out var copper);
+            line.Text += valueAsString(plat, gold, silver, copper);
 
             if (plat > 0)
             {
-                line.overrideColor = settings.platColour;
+                line.OverrideColor = settings.platColour;
             }
             else if (gold > 0)
             {
-                line.overrideColor = settings.goldColour;
+                line.OverrideColor = settings.goldColour;
             }
             else if (silver > 0)
             {
-                line.overrideColor = settings.silverColour;
+                line.OverrideColor = settings.silverColour;
             }
             else
             {
-                line.overrideColor = settings.copperColour;
+                line.OverrideColor = settings.copperColour;
             }
         }
 
         public string colourAsHexString(Color colour)
         {
-            return $"{colour.R.ToString("x2")}{colour.G.ToString("x2")}{colour.B.ToString("x2")}";
+            return $"{colour.R:x2}{colour.G:x2}{colour.B:x2}";
         }
 
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
             if (!settings.enabled)
                 return;
-            
+
             string startColour = settings.useHighlightColour ? $"[c/{colourAsHexString(settings.highlightColour)}:" : "";
             string endColour = settings.useHighlightColour ? "]" : "";
 
@@ -142,8 +134,8 @@ namespace ZephsImprovedTooltips
                 isTool = true;
             }
 
-            if (item.melee &&
-                item.shoot > 0 &&
+            if (item.CountsAsClass(DamageClass.Melee) &&
+                item.shoot > ProjectileID.None &&
                 item.useAnimation <= item.useTime)
             {
                 //Swords with projectiles end up having high use-time (projectile shot delay) with low animation time (sword hits) for some reason
@@ -153,7 +145,7 @@ namespace ZephsImprovedTooltips
 
             Item ammoItem = null;
 
-            if (item.ranged && item.useAmmo != 0)
+            if (item.CountsAsClass(DamageClass.Ranged) && item.useAmmo != 0)
             {
                 //try ammo slots first
                 for (int i = 54; i < 58; ++i)
@@ -172,17 +164,12 @@ namespace ZephsImprovedTooltips
                 //then any slot if not
                 if (ammoItem == null)
                 {
-                    for (int i = 0; i < Main.LocalPlayer.inventory.Length; ++i)
+                    foreach (var pItem in Main.LocalPlayer.inventory)
                     {
-                        Item pItem = Main.LocalPlayer.inventory[i];
-                        if (pItem.ammo > 0)
-                        {
-                            if (pItem.ammo == item.useAmmo && pItem.Name != "")
-                            {
-                                ammoItem = pItem;
-                                break;
-                            }
-                        }
+                        if (pItem.ammo <= 0) continue;
+                        if (pItem.ammo != item.useAmmo || pItem.Name == "") continue;
+                        ammoItem = pItem;
+                        break;
                     }
                 }
             }
@@ -190,12 +177,7 @@ namespace ZephsImprovedTooltips
             int speed;
 
             if (firesProjectile ||
-                isTool)
-            {
-                speed = item.useAnimation;
-           }
-            else if (item.useAnimation > 0 &&
-                item.useAnimation < 100)
+                isTool || item.useAnimation is > 0 and < 100)
             {
                 speed = item.useAnimation;
             }
@@ -204,15 +186,15 @@ namespace ZephsImprovedTooltips
                 speed = item.useTime;
             }
 
-            //Main.NewText(item.ammo + ", " + item.useAmmo + ", " + Main.item[item.useAmmo].type + ", " + item.shoot + ", " + Main.projectile[item.shoot].arrow);
-            //Main.NewText(item.useTime + ", " + item.useAnimation + ", " + speed + ", " + firesProjectile + ", " + item.reuseDelay + ", " + item.autoReuse); ;
-            //The crit takes in to account the currently held item, but we only care about the item we're moused over
-            //Therefore, get the difference between the two and then apply it to the player's total crit later
-            int critDiff = -Main.LocalPlayer.HeldItem.crit + item.crit;
-
-            //takes in to account melee speed increases
+            //takes in to account attack speed increases (1.4: multiplier above 1 means faster)
             float realSpeed = speed;
-            //takes in to account melee damage increases
+            float attackSpeedMult = Main.LocalPlayer.GetTotalAttackSpeed(item.DamageType);
+            if (attackSpeedMult > 0)
+            {
+                realSpeed /= attackSpeedMult;
+            }
+
+            //takes in to account class damage increases
             float realDamage = 0;
             float ammoDamage = 0;
 
@@ -224,34 +206,16 @@ namespace ZephsImprovedTooltips
             //the average crit damage given the total crit chance, e.g. 20 damage with 50% crit is 30 crit damage
             int critDamage = 0;
             int critAmmoDamage = 0;
-            if (item.melee)
+            if (item.damage > 0 && item.DamageType != DamageClass.Default)
             {
-                realSpeed *= Main.LocalPlayer.meleeSpeed;
-                realDamage = item.damage * Main.LocalPlayer.meleeDamage;
-                float realCritChance =  Math.Min(1, (Main.LocalPlayer.meleeCrit + critDiff) / 100.0f); //Return 1 if above, over 100% crit doesn't actually increase damage at all
-                critDamage = (int)(realDamage * (2.0f * realCritChance));
-            }
-            else if (item.ranged)
-            {
-                realDamage = item.damage * Main.LocalPlayer.rangedDamage;
-                float realCritChance = Math.Min(1, (Main.LocalPlayer.rangedCrit + critDiff) / 100.0f);
+                //1.4: GetWeaponDamage/GetWeaponCrit already include the player's class bonuses and the item's own crit
+                realDamage = Main.LocalPlayer.GetWeaponDamage(item);
+                float realCritChance = Math.Min(1, Main.LocalPlayer.GetWeaponCrit(item) / 100.0f); //Return 1 if above, over 100% crit doesn't actually increase damage at all
                 critDamage = (int)(realDamage * (2.0f * realCritChance));
                 critAmmoDamage = (int)(ammoDamage * (2.0f * realCritChance));
             }
-            else if (item.thrown)
-            {
-                realDamage = item.damage * Main.LocalPlayer.thrownDamage;
-                float realCritChance = Math.Min(1, (Main.LocalPlayer.thrownCrit + critDiff) / 100.0f);
-                critDamage = (int)(realDamage * (2.0f * realCritChance));
-            }
-            else if (item.magic)
-            {
-                realDamage = item.damage * Main.LocalPlayer.magicDamage;
-                float realCritChance = Math.Min(1, (Main.LocalPlayer.magicCrit + critDiff) / 100.0f);
-                critDamage = (int)(realDamage * (2.0f * realCritChance));
-            }
 
-            //Not sure if this should go before or after the meleeSpeed changes
+            //Not sure if this should go before or after the attack speed changes
             realSpeed += item.reuseDelay + (item.autoReuse ? -1 : 0);
             //60 ticks in a second, if realSpeed is <=0 just set it to cap at 60 per second, don't divide by 0/negative attacks per second)
             float attacksPerSecond = 60.0f / (realSpeed > 0 ? realSpeed : 1);
@@ -264,7 +228,7 @@ namespace ZephsImprovedTooltips
             for (int i = 0; i < tooltips.Count; ++i)
             {
                 TooltipLine line = tooltips[i];
-								
+
                 if (settings.useHighlightColour && (line.Name == "Damage" ||
                     line.Name == "CritChance" ||
                     line.Name == "PickPower" ||
@@ -272,64 +236,66 @@ namespace ZephsImprovedTooltips
                     line.Name == "HammerPower" ||
                     line.Name == "Defense"))
                 {
-                    int spaceIndex = line.text.IndexOf(' ');
+                    int spaceIndex = line.Text.IndexOf(' ');
                     if (spaceIndex >= 0)
                     {
-                        line.text = startColour + line.text.Substring(0, spaceIndex) + endColour + line.text.Substring(spaceIndex, line.text.Length - spaceIndex);
+                        line.Text = startColour + line.Text.Substring(0, spaceIndex) + endColour + line.Text.Substring(spaceIndex, line.Text.Length - spaceIndex);
                     }
                 }
 
                 if (line.Name == "Damage" && ammoDamage > 0)
                 {
-                    int spaceIndex = line.text.IndexOf(" ");
+                    int spaceIndex = line.Text.IndexOf(' ');
                     if (spaceIndex >= 0)
                     {
-                        line.text = $"{line.text.Substring(0, spaceIndex)}+{ammoDamage + line.text.Substring(spaceIndex, line.text.Length - spaceIndex)}";
+                        line.Text = $"{line.Text[..spaceIndex]}+{ammoDamage + line.Text.Substring(spaceIndex, line.Text.Length - spaceIndex)}";
                     }
                 }
-                else if (line.Name == "Speed" && line.text.Length >= 6)
+                else if (line.Name == "Speed" && line.Text.Length >= 6)
                 {
-                    line.text = $"{startColour + attacksPerSecond.ToString("0.#") + endColour} attacks per second ({line.text.Substring(0, line.text.Length - 6)})"; //5 = 5 in speed + space
+                    line.Text = $"{startColour + attacksPerSecond.ToString("0.#") + endColour} attacks per second ({line.Text.Substring(0, line.Text.Length - 6)})"; //5 = 5 in speed + space
 
-                    TooltipLine dpsLine = new TooltipLine(mod, "DPS", "");
+                    TooltipLine dpsLine = new TooltipLine(Mod, "DPS", "");
 
                     if (ammoDamage > 0)
                     {
-                        dpsLine.text = startColour + totalDPS + endColour + "+" + (dpsAmmoOnly + dpsCritAmmoOnly) + " damage per second";
+                        dpsLine.Text = startColour + totalDPS + endColour + "+" + (dpsAmmoOnly + dpsCritAmmoOnly) + " damage per second";
                         if (dpsCrit > 0)
                         {
                             if (dpsCritAmmoOnly > 0)
                             {
-                                dpsLine.text += " (" + dpsCrit + "+" + dpsCritAmmoOnly + " from crits)";
+                                dpsLine.Text += " (" + dpsCrit + "+" + dpsCritAmmoOnly + " from crits)";
                             }
                             else
                             {
-                                dpsLine.text += " (" + dpsCrit + " from crits)";
+                                dpsLine.Text += " (" + dpsCrit + " from crits)";
                             }
                         }
                     }
                     else
                     {
-                        dpsLine.text = startColour + totalDPS + endColour + " damage per second";
+                        dpsLine.Text = startColour + totalDPS + endColour + " damage per second";
                         if (dpsCrit > 0)
                         {
-                            dpsLine.text += " (" + dpsCrit + " from crits)";
+                            dpsLine.Text += " (" + dpsCrit + " from crits)";
                         }
                     }
                     tooltips.Insert(i + 1, dpsLine);
                     i++;
                 }
-                else if (line.Name == "Knockback" && line.text.Length >= 10)
+                else if (line.Name == "Knockback" && line.Text.Length >= 10)
                 {
                     if (item.knockBack > 0)
                     {
-                        line.text = startColour + item.knockBack.ToString("0.#") + endColour + " knockback (" + line.text.Substring(0, line.text.Length - 10) + ")"; //10 = 9 characters in knockback + space
+                        line.Text = startColour + item.knockBack.ToString("0.#") + endColour + " knockback (" + line.Text.Substring(0, line.Text.Length - 10) + ")"; //10 = 9 characters in knockback + space
                     }
 
                     if (ammoDamage > 0 && settings.showAmmunition)
                     {
-                        TooltipLine l = new TooltipLine(mod, "Ammo", "");
-                        l.text = "Using Ammunition " + ammoItem.Name;
+                        TooltipLine l = new TooltipLine(Mod, "Ammo", "")
+                        {
+                            Text = "Using Ammunition " + ammoItem.Name
+                        };
                         if (i < tooltips.Count - 1)
                         {
                             tooltips.Insert(i + 1, l);
@@ -340,37 +306,37 @@ namespace ZephsImprovedTooltips
                         }
                     }
                 }
-            };
+            }
 
             // Player is not in an NPC's Shop
             if (Main.npcShop <= 0)
             {
                 {
-                    TooltipLine line = new TooltipLine(mod, "Reforge", "");
+                    TooltipLine line = new TooltipLine(Mod, "Reforge", "");
                     reforgePriceTooltip(item, line);
 
-                    if (line.text != "")
+                    if (line.Text != "")
                     {
                         tooltips.Add(line);
                     }
                 }
 
                 {
-                    TooltipLine line = new TooltipLine(mod, "Sell", "");
+                    TooltipLine line = new TooltipLine(Mod, "Sell", "");
                     sellPriceTooltip(item, line);
-                    
-                    if (line.text != "")
+
+                    if (line.Text != "")
                     {
                         tooltips.Add(line);
                     }
                 }
             }
 
-            if (settings.showModName && item.modItem != null)
+            if (settings.showModName && item.ModItem != null)
             {
                 string startModColour = settings.showModName ? $"[c/{colourAsHexString(settings.modColour)}:" : "";
                 string endModColour = settings.showModName ? "]" : "";
-                tooltips.Add(new TooltipLine(mod, "ModName", $"{startModColour}{item.modItem.mod.DisplayName}{endModColour}"));
+                tooltips.Add(new TooltipLine(Mod, "ModName", $"{startModColour}{item.ModItem.Mod.DisplayName}{endModColour}"));
             }
         }
     }

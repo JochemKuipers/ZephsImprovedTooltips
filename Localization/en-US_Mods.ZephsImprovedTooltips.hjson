@@ -1,0 +1,83 @@
+Configs: {
+	TooltipConfig: {
+		DisplayName: Config
+
+		enabled: {
+			Label: Enable improved tooltips
+			Tooltip: ""
+		}
+
+		reforgeVisibility: {
+			Label: Reforge Visibility
+			Tooltip: ""
+		}
+
+		sellVisibility: {
+			Label: Sellprice Visibility
+			Tooltip: ""
+		}
+
+		highlightColourEnabled: {
+			Label: Enable Highlight Colour
+			Tooltip: Highlights some numbers in tooltips
+		}
+
+		showModName: {
+			Label: Show Mod Name
+			Tooltip: Shows the mod that an item came from
+		}
+
+		showAmmunition: {
+			Label: Show Ammunition
+			Tooltip: ""
+		}
+
+		reforgeColour: {
+			Label: Reforge Colour
+			Tooltip: ""
+		}
+
+		highlightColour: {
+			Label: Highlight Colour
+			Tooltip: ""
+		}
+
+		modColour: {
+			Label: Mod Name Colour
+			Tooltip: ""
+		}
+	}
+
+	ReforgeVisibility: {
+		Tooltip: ""
+
+		NeverShow: {
+			Label: Never Show
+			Tooltip: ""
+		}
+
+		ShowIfTinkererExists: {
+			Label: Show If Tinkerer Exists
+			Tooltip: ""
+		}
+
+		AlwaysShow: {
+			Label: Always Show
+			Tooltip: ""
+		}
+	}
+
+	SellVisibility: {
+		Tooltip: ""
+
+		NeverShow: {
+			Label: Never Show
+			Tooltip: ""
+		}
+
+		AlwaysShow: {
+			Label: Always Show
+			Tooltip: ""
+		}
+	}
+}
