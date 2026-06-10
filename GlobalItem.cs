@@ -11,7 +11,7 @@ namespace ZephsImprovedTooltips
     {
         public static Settings Settings = new();
 
-        public void SplitValue(int totalCopper, out int plat, out int gold, out int silver, out int copper)
+        public static void SplitValue(int totalCopper, out int plat, out int gold, out int silver, out int copper)
         {
             plat = totalCopper / 1000000;
             totalCopper %= 1000000;
@@ -22,7 +22,7 @@ namespace ZephsImprovedTooltips
             copper = totalCopper;
         }
 
-        public string ValueAsString(int plat, int gold, int silver, int copper)
+        public static string ValueAsString(int plat, int gold, int silver, int copper)
         {
             var line = string.Empty;
 
@@ -50,7 +50,7 @@ namespace ZephsImprovedTooltips
             return line;
         }
 
-        public void ReforgePriceTooltip(Item item, TooltipLine line)
+        public static void ReforgePriceTooltip(Item item, TooltipLine line)
         {
             var enabled = !(Settings.reforgeVisiblity == Settings.ReforgeVisibility.NeverShow
                             || (Settings.reforgeVisiblity == Settings.ReforgeVisibility.ShowIfTinkererExists && !NPC.savedGoblin));
@@ -71,7 +71,7 @@ namespace ZephsImprovedTooltips
             line.Text += ValueAsString(plat, gold, silver, copper);
         }
 
-        public void SellPriceTooltip(Item item, TooltipLine line)
+        public static void SellPriceTooltip(Item item, TooltipLine line)
         {
             var enabled = Settings.sellVisibility == Settings.SellVisibility.AlwaysShow;
 
@@ -111,7 +111,7 @@ namespace ZephsImprovedTooltips
             }
         }
 
-        public string ColourAsHexString(Color colour)
+        public static string ColourAsHexString(Color colour)
         {
             return $"{colour.R:x2}{colour.G:x2}{colour.B:x2}";
         }
@@ -121,11 +121,11 @@ namespace ZephsImprovedTooltips
             if (!Settings.enabled)
                 return;
 
-            string startColour = Settings.useHighlightColour ? $"[c/{ColourAsHexString(Settings.highlightColour)}:" : "";
-            string endColour = Settings.useHighlightColour ? "]" : "";
+            var startColour = Settings.useHighlightColour ? $"[c/{ColourAsHexString(Settings.highlightColour)}:" : "";
+            var endColour = Settings.useHighlightColour ? "]" : "";
 
-            bool isTool = false;
-            bool firesProjectile = false;
+            var isTool = false;
+            var firesProjectile = false;
 
             if (item.pick > 0 ||
                 item.axe > 0 ||
@@ -148,17 +148,13 @@ namespace ZephsImprovedTooltips
             if (item.CountsAsClass(DamageClass.Ranged) && item.useAmmo != 0)
             {
                 //try ammo slots first
-                for (int i = 54; i < 58; ++i)
+                for (var i = 54; i < 58; ++i)
                 {
-                    Item pItem = Main.LocalPlayer.inventory[i];
-                    if (pItem.ammo > 0)
-                    {
-                        if (pItem.ammo == item.useAmmo && pItem.Name != "")
-                        {
-                            ammoItem = pItem;
-                            break;
-                        }
-                    }
+                    var pItem = Main.LocalPlayer.inventory[i];
+                    if (pItem.ammo <= 0) continue;
+                    if (pItem.ammo != item.useAmmo || pItem.Name == "") continue;
+                    ammoItem = pItem;
+                    break;
                 }
 
                 //then any slot if not
@@ -188,7 +184,7 @@ namespace ZephsImprovedTooltips
 
             //takes in to account attack speed increases (1.4: multiplier above 1 means faster)
             float realSpeed = speed;
-            float attackSpeedMult = Main.LocalPlayer.GetTotalAttackSpeed(item.DamageType);
+            var attackSpeedMult = Main.LocalPlayer.GetTotalAttackSpeed(item.DamageType);
             if (attackSpeedMult > 0)
             {
                 realSpeed /= attackSpeedMult;
@@ -204,13 +200,13 @@ namespace ZephsImprovedTooltips
             }
 
             //the average crit damage given the total crit chance, e.g. 20 damage with 50% crit is 30 crit damage
-            int critDamage = 0;
-            int critAmmoDamage = 0;
+            var critDamage = 0;
+            var critAmmoDamage = 0;
             if (item.damage > 0 && item.DamageType != DamageClass.Default)
             {
                 //1.4: GetWeaponDamage/GetWeaponCrit already include the player's class bonuses and the item's own crit
                 realDamage = Main.LocalPlayer.GetWeaponDamage(item);
-                float realCritChance = Math.Min(1, Main.LocalPlayer.GetWeaponCrit(item) / 100.0f); //Return 1 if above, over 100% crit doesn't actually increase damage at all
+                var realCritChance = Math.Min(1, Main.LocalPlayer.GetWeaponCrit(item) / 100.0f); //Return 1 if above, over 100% crit doesn't actually increase damage at all
                 critDamage = (int)(realDamage * (2.0f * realCritChance));
                 critAmmoDamage = (int)(ammoDamage * (2.0f * realCritChance));
             }
@@ -218,16 +214,16 @@ namespace ZephsImprovedTooltips
             //Not sure if this should go before or after the attack speed changes
             realSpeed += item.reuseDelay + (item.autoReuse ? -1 : 0);
             //60 ticks in a second, if realSpeed is <=0 just set it to cap at 60 per second, don't divide by 0/negative attacks per second)
-            float attacksPerSecond = 60.0f / (realSpeed > 0 ? realSpeed : 1);
-            int dps = (int)(realDamage / (1.0f / attacksPerSecond));
-            int dpsCrit = (int)(critDamage / (1.0f / attacksPerSecond));
-            int dpsAmmoOnly = (int)(ammoDamage / (1.0f / attacksPerSecond));
-            int dpsCritAmmoOnly = (int)(critAmmoDamage / (1.0f / attacksPerSecond));
-            int totalDps = dps + dpsCrit; //excludes ammo
+            var attacksPerSecond = 60.0f / (realSpeed > 0 ? realSpeed : 1);
+            var dps = (int)(realDamage / (1.0f / attacksPerSecond));
+            var dpsCrit = (int)(critDamage / (1.0f / attacksPerSecond));
+            var dpsAmmoOnly = (int)(ammoDamage / (1.0f / attacksPerSecond));
+            var dpsCritAmmoOnly = (int)(critAmmoDamage / (1.0f / attacksPerSecond));
+            var totalDps = dps + dpsCrit; //excludes ammo
 
-            for (int i = 0; i < tooltips.Count; ++i)
+            for (var i = 0; i < tooltips.Count; ++i)
             {
-                TooltipLine line = tooltips[i];
+                var line = tooltips[i];
 
                 if (Settings.useHighlightColour && (line.Name == "Damage" ||
                     line.Name == "CritChance" ||
@@ -236,74 +232,82 @@ namespace ZephsImprovedTooltips
                     line.Name == "HammerPower" ||
                     line.Name == "Defense"))
                 {
-                    int spaceIndex = line.Text.IndexOf(' ');
+                    var spaceIndex = line.Text.IndexOf(' ');
                     if (spaceIndex >= 0)
                     {
                         line.Text = startColour + line.Text.Substring(0, spaceIndex) + endColour + line.Text.Substring(spaceIndex, line.Text.Length - spaceIndex);
                     }
                 }
 
-                if (line.Name == "Damage" && ammoDamage > 0)
+                switch (line.Name)
                 {
-                    int spaceIndex = line.Text.IndexOf(' ');
-                    if (spaceIndex >= 0)
+                    case "Damage" when ammoDamage > 0:
                     {
-                        line.Text = $"{line.Text[..spaceIndex]}+{ammoDamage + line.Text.Substring(spaceIndex, line.Text.Length - spaceIndex)}";
-                    }
-                }
-                else if (line.Name == "Speed" && line.Text.Length >= 6)
-                {
-                    line.Text = $"{startColour + attacksPerSecond.ToString("0.#") + endColour} attacks per second ({line.Text.Substring(0, line.Text.Length - 6)})"; //5 = 5 in speed + space
-
-                    TooltipLine dpsLine = new TooltipLine(Mod, "DPS", "");
-
-                    if (ammoDamage > 0)
-                    {
-                        dpsLine.Text = startColour + totalDps + endColour + "+" + (dpsAmmoOnly + dpsCritAmmoOnly) + " damage per second";
-                        if (dpsCrit > 0)
+                        var spaceIndex = line.Text.IndexOf(' ');
+                        if (spaceIndex >= 0)
                         {
-                            if (dpsCritAmmoOnly > 0)
+                            line.Text = $"{line.Text[..spaceIndex]}+{ammoDamage + line.Text.Substring(spaceIndex, line.Text.Length - spaceIndex)}";
+                        }
+
+                        break;
+                    }
+                    case "Speed" when line.Text.Length >= 6:
+                    {
+                        line.Text = $"{startColour + attacksPerSecond.ToString("0.#") + endColour} attacks per second ({line.Text.Substring(0, line.Text.Length - 6)})"; //5 = 5 in speed + space
+
+                        var dpsLine = new TooltipLine(Mod, "DPS", "");
+
+                        if (ammoDamage > 0)
+                        {
+                            dpsLine.Text = startColour + totalDps + endColour + "+" + (dpsAmmoOnly + dpsCritAmmoOnly) + " damage per second";
+                            if (dpsCrit > 0)
                             {
-                                dpsLine.Text += " (" + dpsCrit + "+" + dpsCritAmmoOnly + " from crits)";
+                                if (dpsCritAmmoOnly > 0)
+                                {
+                                    dpsLine.Text += " (" + dpsCrit + "+" + dpsCritAmmoOnly + " from crits)";
+                                }
+                                else
+                                {
+                                    dpsLine.Text += " (" + dpsCrit + " from crits)";
+                                }
                             }
-                            else
+                        }
+                        else
+                        {
+                            dpsLine.Text = startColour + totalDps + endColour + " damage per second";
+                            if (dpsCrit > 0)
                             {
                                 dpsLine.Text += " (" + dpsCrit + " from crits)";
                             }
                         }
+                        tooltips.Insert(i + 1, dpsLine);
+                        i++;
+                        break;
                     }
-                    else
+                    case "Knockback" when line.Text.Length >= 10:
                     {
-                        dpsLine.Text = startColour + totalDps + endColour + " damage per second";
-                        if (dpsCrit > 0)
+                        if (item.knockBack > 0)
                         {
-                            dpsLine.Text += " (" + dpsCrit + " from crits)";
+                            line.Text = startColour + item.knockBack.ToString("0.#") + endColour + " knockback (" + line.Text.Substring(0, line.Text.Length - 10) + ")"; //10 = 9 characters in knockback + space
                         }
-                    }
-                    tooltips.Insert(i + 1, dpsLine);
-                    i++;
-                }
-                else if (line.Name == "Knockback" && line.Text.Length >= 10)
-                {
-                    if (item.knockBack > 0)
-                    {
-                        line.Text = startColour + item.knockBack.ToString("0.#") + endColour + " knockback (" + line.Text.Substring(0, line.Text.Length - 10) + ")"; //10 = 9 characters in knockback + space
-                    }
 
-                    if (ammoDamage > 0 && Settings.showAmmunition)
-                    {
-                        TooltipLine l = new TooltipLine(Mod, "Ammo", "")
+                        if (ammoDamage > 0 && Settings.showAmmunition)
                         {
-                            Text = "Using Ammunition " + ammoItem.Name
-                        };
-                        if (i < tooltips.Count - 1)
-                        {
-                            tooltips.Insert(i + 1, l);
+                            var l = new TooltipLine(Mod, "Ammo", "")
+                            {
+                                Text = "Using Ammunition " + ammoItem.Name
+                            };
+                            if (i < tooltips.Count - 1)
+                            {
+                                tooltips.Insert(i + 1, l);
+                            }
+                            else
+                            {
+                                tooltips.Add(l);
+                            }
                         }
-                        else
-                        {
-                            tooltips.Add(l);
-                        }
+
+                        break;
                     }
                 }
             }
@@ -312,7 +316,7 @@ namespace ZephsImprovedTooltips
             if (Main.npcShop <= 0)
             {
                 {
-                    TooltipLine line = new TooltipLine(Mod, "Reforge", "");
+                    var line = new TooltipLine(Mod, "Reforge", "");
                     ReforgePriceTooltip(item, line);
 
                     if (line.Text != "")
@@ -322,7 +326,7 @@ namespace ZephsImprovedTooltips
                 }
 
                 {
-                    TooltipLine line = new TooltipLine(Mod, "Sell", "");
+                    var line = new TooltipLine(Mod, "Sell", "");
                     SellPriceTooltip(item, line);
 
                     if (line.Text != "")
@@ -332,12 +336,10 @@ namespace ZephsImprovedTooltips
                 }
             }
 
-            if (Settings.showModName && item.ModItem != null)
-            {
-                string startModColour = Settings.showModName ? $"[c/{ColourAsHexString(Settings.modColour)}:" : "";
-                string endModColour = Settings.showModName ? "]" : "";
-                tooltips.Add(new TooltipLine(Mod, "ModName", $"{startModColour}{item.ModItem.Mod.DisplayName}{endModColour}"));
-            }
+            if (!Settings.showModName || item.ModItem == null) return;
+            var startModColour = Settings.showModName ? $"[c/{ColourAsHexString(Settings.modColour)}:" : "";
+            var endModColour = Settings.showModName ? "]" : "";
+            tooltips.Add(new TooltipLine(Mod, "ModName", $"{startModColour}{item.ModItem.Mod.DisplayName}{endModColour}"));
         }
     }
 }
