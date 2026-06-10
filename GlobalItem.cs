@@ -9,9 +9,9 @@ namespace ZephsImprovedTooltips
 {
     public class ZephsImprovedTooltipsGlobalItem : GlobalItem
     {
-        public static Settings settings = new();
+        public static Settings Settings = new();
 
-        public void splitValue(int totalCopper, out int plat, out int gold, out int silver, out int copper)
+        public void SplitValue(int totalCopper, out int plat, out int gold, out int silver, out int copper)
         {
             plat = totalCopper / 1000000;
             totalCopper %= 1000000;
@@ -22,9 +22,9 @@ namespace ZephsImprovedTooltips
             copper = totalCopper;
         }
 
-        public string valueAsString(int plat, int gold, int silver, int copper)
+        public string ValueAsString(int plat, int gold, int silver, int copper)
         {
-            string line = "";
+            var line = string.Empty;
 
             if (plat > 0)
             {
@@ -50,10 +50,10 @@ namespace ZephsImprovedTooltips
             return line;
         }
 
-        public void reforgePriceTooltip(Item item, TooltipLine line)
+        public void ReforgePriceTooltip(Item item, TooltipLine line)
         {
-            var enabled = !(settings.reforgeVisiblity == Settings.ReforgeVisibility.NeverShow
-                            || (settings.reforgeVisiblity == Settings.ReforgeVisibility.ShowIfTinkererExists && !NPC.savedGoblin));
+            var enabled = !(Settings.reforgeVisiblity == Settings.ReforgeVisibility.NeverShow
+                            || (Settings.reforgeVisiblity == Settings.ReforgeVisibility.ShowIfTinkererExists && !NPC.savedGoblin));
 
             var totalValue = (int)(item.GetStoreValue() / 3.0f);
 
@@ -65,17 +65,17 @@ namespace ZephsImprovedTooltips
             }
 
             line.Text = "Reforge price: ";
-            line.OverrideColor = settings.reforgeColour;
+            line.OverrideColor = Settings.reforgeColour;
 
-            splitValue(totalValue, out var plat, out var gold, out var silver, out var copper);
-            line.Text += valueAsString(plat, gold, silver, copper);
+            SplitValue(totalValue, out var plat, out var gold, out var silver, out var copper);
+            line.Text += ValueAsString(plat, gold, silver, copper);
         }
 
-        public void sellPriceTooltip(Item item, TooltipLine line)
+        public void SellPriceTooltip(Item item, TooltipLine line)
         {
-            bool enabled = settings.sellVisibility == Settings.SellVisibility.AlwaysShow;
+            var enabled = Settings.sellVisibility == Settings.SellVisibility.AlwaysShow;
 
-            int totalValue = (int)((item.GetStoreValue() * (long)item.stack) / 5.0f);
+            var totalValue = (int)((item.GetStoreValue() * (long)item.stack) / 5.0f);
 
             if (!enabled ||
                 item.type == ItemID.CopperCoin ||
@@ -90,39 +90,39 @@ namespace ZephsImprovedTooltips
 
             line.Text = "Sell price: ";
 
-            splitValue(totalValue, out var plat, out var gold, out var silver, out var copper);
-            line.Text += valueAsString(plat, gold, silver, copper);
+            SplitValue(totalValue, out var plat, out var gold, out var silver, out var copper);
+            line.Text += ValueAsString(plat, gold, silver, copper);
 
             if (plat > 0)
             {
-                line.OverrideColor = settings.platColour;
+                line.OverrideColor = Settings.platColour;
             }
             else if (gold > 0)
             {
-                line.OverrideColor = settings.goldColour;
+                line.OverrideColor = Settings.goldColour;
             }
             else if (silver > 0)
             {
-                line.OverrideColor = settings.silverColour;
+                line.OverrideColor = Settings.silverColour;
             }
             else
             {
-                line.OverrideColor = settings.copperColour;
+                line.OverrideColor = Settings.copperColour;
             }
         }
 
-        public string colourAsHexString(Color colour)
+        public string ColourAsHexString(Color colour)
         {
             return $"{colour.R:x2}{colour.G:x2}{colour.B:x2}";
         }
 
         public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
         {
-            if (!settings.enabled)
+            if (!Settings.enabled)
                 return;
 
-            string startColour = settings.useHighlightColour ? $"[c/{colourAsHexString(settings.highlightColour)}:" : "";
-            string endColour = settings.useHighlightColour ? "]" : "";
+            string startColour = Settings.useHighlightColour ? $"[c/{ColourAsHexString(Settings.highlightColour)}:" : "";
+            string endColour = Settings.useHighlightColour ? "]" : "";
 
             bool isTool = false;
             bool firesProjectile = false;
@@ -223,13 +223,13 @@ namespace ZephsImprovedTooltips
             int dpsCrit = (int)(critDamage / (1.0f / attacksPerSecond));
             int dpsAmmoOnly = (int)(ammoDamage / (1.0f / attacksPerSecond));
             int dpsCritAmmoOnly = (int)(critAmmoDamage / (1.0f / attacksPerSecond));
-            int totalDPS = dps + dpsCrit; //excludes ammo
+            int totalDps = dps + dpsCrit; //excludes ammo
 
             for (int i = 0; i < tooltips.Count; ++i)
             {
                 TooltipLine line = tooltips[i];
 
-                if (settings.useHighlightColour && (line.Name == "Damage" ||
+                if (Settings.useHighlightColour && (line.Name == "Damage" ||
                     line.Name == "CritChance" ||
                     line.Name == "PickPower" ||
                     line.Name == "AxePower" ||
@@ -259,7 +259,7 @@ namespace ZephsImprovedTooltips
 
                     if (ammoDamage > 0)
                     {
-                        dpsLine.Text = startColour + totalDPS + endColour + "+" + (dpsAmmoOnly + dpsCritAmmoOnly) + " damage per second";
+                        dpsLine.Text = startColour + totalDps + endColour + "+" + (dpsAmmoOnly + dpsCritAmmoOnly) + " damage per second";
                         if (dpsCrit > 0)
                         {
                             if (dpsCritAmmoOnly > 0)
@@ -274,7 +274,7 @@ namespace ZephsImprovedTooltips
                     }
                     else
                     {
-                        dpsLine.Text = startColour + totalDPS + endColour + " damage per second";
+                        dpsLine.Text = startColour + totalDps + endColour + " damage per second";
                         if (dpsCrit > 0)
                         {
                             dpsLine.Text += " (" + dpsCrit + " from crits)";
@@ -290,7 +290,7 @@ namespace ZephsImprovedTooltips
                         line.Text = startColour + item.knockBack.ToString("0.#") + endColour + " knockback (" + line.Text.Substring(0, line.Text.Length - 10) + ")"; //10 = 9 characters in knockback + space
                     }
 
-                    if (ammoDamage > 0 && settings.showAmmunition)
+                    if (ammoDamage > 0 && Settings.showAmmunition)
                     {
                         TooltipLine l = new TooltipLine(Mod, "Ammo", "")
                         {
@@ -313,7 +313,7 @@ namespace ZephsImprovedTooltips
             {
                 {
                     TooltipLine line = new TooltipLine(Mod, "Reforge", "");
-                    reforgePriceTooltip(item, line);
+                    ReforgePriceTooltip(item, line);
 
                     if (line.Text != "")
                     {
@@ -323,7 +323,7 @@ namespace ZephsImprovedTooltips
 
                 {
                     TooltipLine line = new TooltipLine(Mod, "Sell", "");
-                    sellPriceTooltip(item, line);
+                    SellPriceTooltip(item, line);
 
                     if (line.Text != "")
                     {
@@ -332,10 +332,10 @@ namespace ZephsImprovedTooltips
                 }
             }
 
-            if (settings.showModName && item.ModItem != null)
+            if (Settings.showModName && item.ModItem != null)
             {
-                string startModColour = settings.showModName ? $"[c/{colourAsHexString(settings.modColour)}:" : "";
-                string endModColour = settings.showModName ? "]" : "";
+                string startModColour = Settings.showModName ? $"[c/{ColourAsHexString(Settings.modColour)}:" : "";
+                string endModColour = Settings.showModName ? "]" : "";
                 tooltips.Add(new TooltipLine(Mod, "ModName", $"{startModColour}{item.ModItem.Mod.DisplayName}{endModColour}"));
             }
         }

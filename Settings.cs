@@ -1,22 +1,26 @@
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace ZephsImprovedTooltips
 {
 
-    public class Settings
+public class Settings
+{
+    // Enum members are selected via the config UI, not all are referenced in code
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    public enum ReforgeVisibility
     {
-        public enum ReforgeVisibility
-        {
-            NeverShow,
-            ShowIfTinkererExists,
-            AlwaysShow
-        }
+        NeverShow,
+        ShowIfTinkererExists,
+        AlwaysShow
+    }
 
-        public enum SellVisibility
-        {
-            NeverShow,
-            AlwaysShow,
-        }
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+    public enum SellVisibility
+    {
+        NeverShow,
+        AlwaysShow,
+    }
 
         public ReforgeVisibility reforgeVisiblity = ReforgeVisibility.ShowIfTinkererExists;
         public SellVisibility sellVisibility = SellVisibility.AlwaysShow;

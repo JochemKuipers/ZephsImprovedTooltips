@@ -2,47 +2,47 @@ Configs: {
 	TooltipConfig: {
 		DisplayName: Config
 
-		enabled: {
+		Enabled: {
 			Label: Enable improved tooltips
 			Tooltip: ""
 		}
 
-		reforgeVisibility: {
+		ReforgeVisibility: {
 			Label: Reforge Visibility
 			Tooltip: ""
 		}
 
-		sellVisibility: {
+		SellVisibility: {
 			Label: Sellprice Visibility
 			Tooltip: ""
 		}
 
-		highlightColourEnabled: {
+		HighlightColourEnabled: {
 			Label: Enable Highlight Colour
 			Tooltip: Highlights some numbers in tooltips
 		}
 
-		showModName: {
+		ShowModName: {
 			Label: Show Mod Name
 			Tooltip: Shows the mod that an item came from
 		}
 
-		showAmmunition: {
+		ShowAmmunition: {
 			Label: Show Ammunition
 			Tooltip: ""
 		}
 
-		reforgeColour: {
+		ReforgeColour: {
 			Label: Reforge Colour
 			Tooltip: ""
 		}
 
-		highlightColour: {
+		HighlightColour: {
 			Label: Highlight Colour
 			Tooltip: ""
 		}
 
-		modColour: {
+		ModColour: {
 			Label: Mod Name Colour
 			Tooltip: ""
 		}
