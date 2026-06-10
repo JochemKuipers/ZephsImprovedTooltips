@@ -26,7 +26,7 @@ public static class DpsTracker
     //pretend a session lasts at least a second so the first few hits don't show an inflated value
     private const uint MinSessionTicks = 60;
 
-    private static readonly Dictionary<int, WeaponData> WeaponDamage = new();
+    private static readonly Dictionary<int, WeaponData> WeaponDamage = [];
 
     public static void RecordDamage(int itemType, int damageDone)
     {

@@ -16,6 +16,7 @@ Enchanted Boomerang
 4% critical strike chance
 4 attacks per second (Very Fast)
 56 damage per second (4 from crits)
+61 measured damage per second
 8 knockback (Very strong)
 Reforges for 1 gold 66 silver 66 copper
 Sells for 1 gold
@@ -32,12 +33,28 @@ Sells for 1 gold
 - Reforge price shown on all valid items
 - Sell price shown on all valid items
 - The mod that an item came from is displayed
+- Measured DPS: shows the real damage per second a weapon dealt while you used it, including secondary effects like split projectiles, explosions, and multi-hits
 - Configure various settings and colours
 
 [c/ffc055:Credits]
 [c/ffa400:- Zephilinox] [i/s1:2420]
 
+[c/ffc055:Port Disclosure]
+This is a port of Zephilinox's original 1.3 mod to modern tModLoader (Terraria 1.4.5).
+Original project: https://github.com/Zephilinox/ZephsImprovedTooltips
+
+[c/ffc055:AI Disclosure]
+The port and the new measured DPS feature were written with the assistance of an AI coding assistant (Cursor), and were manually reviewed and tested in-game.
+
 [c/ffc055:Changelog]
+[c/ffcc99:v0.18.0] 2026/06/10
+- Ported to tModLoader for Terraria 1.4.5
+- DPS calculations now use the modern damage class system, so damage and crit bonuses from any source (vanilla or modded, any damage class) are included automatically
+- Attack speed now uses the modern attack speed system
+- Added measured DPS: tracks the real damage per second a weapon deals while you use it, including secondary effects like split projectiles, explosions, and multi-hits
+- Added option to enable/disable measured DPS
+- Config labels now use tModLoader's localization system
+- Note: config settings will reset to defaults once, due to internal renames
 [c/ffcc99:v0.17.0] 2022/01/19
 - Added various configuration settings and colours
 - Added option to highlight some key tooltip numbers
